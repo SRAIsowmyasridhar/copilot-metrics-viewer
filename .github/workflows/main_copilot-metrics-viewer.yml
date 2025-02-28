@@ -28,7 +28,9 @@ jobs:
       # ✅ Step 3: Install PNPM
       - name: Install PNPM
         run: |
-          npm install -g pnpm
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          echo "$HOME/.local/bin" >> $GITHUB_PATH  # Add PNPM to PATH
           pnpm --version  # Verify PNPM installation
 
       # ✅ Step 4: Install dependencies with PNPM
