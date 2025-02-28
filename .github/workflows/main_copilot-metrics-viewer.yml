@@ -1,14 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy container app to Azure Web App - srai-github-insights
+name: Build and deploy Nuxt 3 app to Azure Web App - srai-github-insights
 
 on:
-
   workflow_dispatch:
 
 jobs:
-
   deploy:
     runs-on: ubuntu-latest
     environment:
@@ -16,17 +14,43 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      # ✅ Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'srai-github-insights'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e94dfd38811a421eafe5ce4eee13b68b }}
-        images: 'ghcr.io//${{ secrets.AzureAppService_ContainerUsername_6e6399ab4c2848209c95dce8fff002f0 }}/github-copilot-resources/copilot-metrics-viewer:${{ github.sha }}'
+      # ✅ Step 2: Set up Node.js (Ensure correct version for Nuxt 3)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Use the Node.js version compatible with Nuxt 3
+          cache: 'pnpm'
+
+      # ✅ Step 3: Install dependencies with PNPM
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      # ✅ Step 4: Build Nuxt 3 app
+      - name: Build Nuxt 3 app
+        run: pnpm run build
+
+      # ✅ Step 5: Azure Login
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ✅ Step 6: Deploy to Azure Web App
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'srai-github-insights'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_e94dfd38811a421eafe5ce4eee13b68b }}
+          package: '.output/'  # Deploy Nuxt 3 output directory
+
+      # ✅ Step 7: Restart Azure Web App after deployment
+      - name: Restart Azure Web App
+        run: az webapp restart --name srai-github-insights --resource-group srai-github-reporting
