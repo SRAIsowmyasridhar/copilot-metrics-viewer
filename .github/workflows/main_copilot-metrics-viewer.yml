@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18  # Use the Node.js version compatible with Nuxt 3
-          cache: 'pnpm'
+          cache: 'npm'
 
       # ✅ Step 3: Install PNPM
       - name: Install PNPM
