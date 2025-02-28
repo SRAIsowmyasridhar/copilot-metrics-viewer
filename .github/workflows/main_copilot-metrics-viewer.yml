@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           corepack enable
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
