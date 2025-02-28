@@ -25,23 +25,29 @@ jobs:
           node-version: 18  # Use the Node.js version compatible with Nuxt 3
           cache: 'pnpm'
 
-      # ✅ Step 3: Install dependencies with PNPM
+      # ✅ Step 3: Install PNPM
+      - name: Install PNPM
+        run: |
+          npm install -g pnpm
+          pnpm --version  # Verify PNPM installation
+
+      # ✅ Step 4: Install dependencies with PNPM
       - name: Install dependencies
         run: |
           corepack enable
           pnpm install --frozen-lockfile
 
-      # ✅ Step 4: Build Nuxt 3 app
+      # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
         run: pnpm run build
 
-      # ✅ Step 5: Azure Login
+      # ✅ Step 6: Azure Login
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Step 6: Deploy to Azure Web App
+      # ✅ Step 7: Deploy to Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -51,6 +57,6 @@ jobs:
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_e94dfd38811a421eafe5ce4eee13b68b }}
           package: '.output/'  # Deploy Nuxt 3 output directory
 
-      # ✅ Step 7: Restart Azure Web App after deployment
+      # ✅ Step 8: Restart Azure Web App after deployment
       - name: Restart Azure Web App
         run: az webapp restart --name srai-github-insights --resource-group srai-github-reporting
