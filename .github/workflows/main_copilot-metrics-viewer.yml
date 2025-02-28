@@ -25,7 +25,7 @@ jobs:
           node-version: 18  # Use the Node.js version compatible with Nuxt 3
           cache: 'npm'
 
-      # ✅ Step 3: Install PNPM
+      # ✅ Step 3: Install & Activate PNPM
       - name: Install PNPM
         run: |
           corepack enable
@@ -35,21 +35,33 @@ jobs:
 
       # ✅ Step 4: Install dependencies with PNPM
       - name: Install dependencies
-        run: |
-          corepack enable
-          pnpm install --no-frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
         run: pnpm run build
 
-      # ✅ Step 6: Azure Login
+      # ✅ Step 6: Ensure `.output/` Contains Server Files
+      - name: Verify Nuxt Build Output
+        run: ls -R .output/
+
+      # ✅ Step 7: Azure Login
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Step 7: Deploy to Azure Web App
+      # ✅ Step 8: Set `NITRO_PRESET=node` in Azure App Service
+      - name: Configure Azure App Service Environment Variables
+        run: |
+          az webapp config appsettings set --resource-group srai-github-reporting --name srai-github-insights --settings NITRO_PRESET=node
+
+      # ✅ Step 9: Set Startup Command for Nuxt Nitro Server
+      - name: Set Startup Command in Azure
+        run: |
+          az webapp config set --resource-group srai-github-reporting --name srai-github-insights --startup-file "node .output/server/index.mjs"
+
+      # ✅ Step 10: Deploy to Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -59,6 +71,10 @@ jobs:
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_e94dfd38811a421eafe5ce4eee13b68b }}
           package: '.output/'  # Deploy Nuxt 3 output directory
 
-      # ✅ Step 8: Restart Azure Web App after deployment
+      # ✅ Step 11: Restart Azure Web App after deployment
       - name: Restart Azure Web App
         run: az webapp restart --name srai-github-insights --resource-group srai-github-reporting
+
+      # ✅ Step 12: Check Azure Web App Logs (For Debugging)
+      - name: Fetch Azure Web App Logs
+        run: az webapp log tail --name srai-github-insights --resource-group srai-github-reporting
