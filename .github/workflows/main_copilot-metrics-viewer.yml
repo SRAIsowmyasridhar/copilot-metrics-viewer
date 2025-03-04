@@ -75,6 +75,8 @@ jobs:
       - name: Restart Azure Web App
         run: az webapp restart --name srai-github-insights --resource-group srai-github-reporting
 
-      # ✅ Step 12: Check Azure Web App Logs (For Debugging)
-      - name: Fetch Azure Web App Logs
+      # ✅ logs
+      - name: Fetch Azure Web App Logs (Only on Failure)
+        if: failure()
         run: az webapp log tail --name srai-github-insights --resource-group srai-github-reporting
+
