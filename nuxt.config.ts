@@ -69,6 +69,7 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    preset: "node",
     plugins: [
       'plugins/http-agent',
     ],
