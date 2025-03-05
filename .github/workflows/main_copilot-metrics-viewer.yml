@@ -47,10 +47,13 @@ jobs:
             exit 1
           fi  
 
+      
+      # ✅ Step prset
       - name: Force Nitro Preset for GitHub Build
         run: |
             echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
-
+            export NITRO_PRESET=node-server
+            printenv | grep NITRO  # ✅ Debugging step to verify
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
