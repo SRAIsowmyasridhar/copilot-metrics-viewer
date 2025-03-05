@@ -68,14 +68,21 @@ export default defineNuxtConfig({
       clientSecret: ''
     }
   },
+
+  // ✅ Corrected Nitro Configuration (Port removed from here)
   nitro: {
-    preset: "node",
-    serveStatic: true,  // ✅ Ensures Azure serves files from `.output/public/`
-    port: process.env.PORT || 8080,  // ✅ Ensures Nuxt uses Azure's required port
+    preset: 'node',   
+    serveStatic: true,  // ✅ Ensures static assets are served correctly
     plugins: [
       'plugins/http-agent',
     ],
   },
+
+  // ✅ Added Server Config for Port
+  server: {
+    port: process.env.PORT || 8080, // ✅ Ensures Nuxt runs on Azure's required port
+  },
+
   runtimeConfig: {
     githubToken: '',
     session: {
@@ -100,4 +107,4 @@ export default defineNuxtConfig({
       isPublicApp: false
     }
   }
-})
+});
