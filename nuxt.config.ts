@@ -70,6 +70,8 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: "node",
+    serveStatic: true,  // ✅ Ensures Azure serves files from `.output/public/`
+    port: process.env.PORT || 8080,  // ✅ Ensures Nuxt uses Azure's required port
     plugins: [
       'plugins/http-agent',
     ],
