@@ -1,10 +1,8 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
+# Docs: https://github.com/Azure/webapps-deploy
 name: Build and deploy Nuxt 3 app to Azure Web App - srai-github-insights
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
 
 jobs:
   deploy:
@@ -39,7 +37,9 @@ jobs:
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
-        run: pnpm run build
+        run: |
+          export NITRO_PRESET=node  # ✅ Ensure Nitro generates `.output/`
+          pnpm run build
 
       # ✅ Step 6: Ensure `.output/` Contains Server Files (Fail if missing)
       - name: Verify Nuxt Build Output
@@ -50,42 +50,45 @@ jobs:
           fi
           ls -R .output/
 
-      # ✅ Step : Debug `.output/` before Deployment
+      # ✅ Step 7: Debug `.output/` before Deployment
       - name: Debug `.output/`
         run: du -sh .output/
 
-      # ✅ Step 7: Azure Login
+      # ✅ Step 8: Compress `.output/` for Deployment
+      - name: Compress `.output/`
+        run: zip -r output.zip .output/
+
+      # ✅ Step 9: Azure Login
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Step 8: Set `NITRO_PRESET=node` in Azure App Service
+      # ✅ Step 10: Set `NITRO_PRESET=node` in Azure App Service
       - name: Configure Azure App Service Environment Variables
         run: |
           az webapp config appsettings set --resource-group srai-github-reporting --name srai-github-insights --settings NITRO_PRESET=node
 
-      # ✅ Step 9: Set Startup Command for Nuxt Nitro Server
+      # ✅ Step 11: Set Startup Command for Nuxt Nitro Server
       - name: Set Startup Command in Azure
         run: |
           az webapp config set --resource-group srai-github-reporting --name srai-github-insights --startup-file "node .output/server/index.mjs"
 
-      # ✅ Step 10: Deploy to Azure Web App
+      # ✅ Step 12: Deploy `.output/` to Azure Web App (Deploy ZIP)
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'srai-github-insights'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_e94dfd38811a421eafe5ce4eee13b68b }}
-          package: '.output/'  # Deploy Nuxt 3 output directory
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile }}
+          package: 'output.zip'  # ✅ Deploy `.output/` as a ZIP
 
-      # ✅ Step 11: Restart Azure Web App after deployment
+      # ✅ Step 13: Restart Azure Web App after deployment
       - name: Restart Azure Web App
         run: az webapp restart --name srai-github-insights --resource-group srai-github-reporting
 
-      # ✅ logs
+      # ✅ Step 14: Fetch Azure Web App Logs (Only on Failure)
       - name: Fetch Azure Web App Logs (Only on Failure)
         if: failure()
         run: az webapp log tail --name srai-github-insights --resource-group srai-github-reporting
-
