@@ -35,6 +35,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+
+      # ✅ Step 5.0: Check and Output Contents of `nuxt.config.ts`
+      - name: Check `nuxt.config.ts`
+        run: |
+          if [ -f "nuxt.config.ts" ]; then
+            echo "Found nuxt.config.ts:"
+            cat nuxt.config.ts
+          else
+            echo "nuxt.config.ts file not found"
+            exit 1
+          fi        
+
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
         run: |
