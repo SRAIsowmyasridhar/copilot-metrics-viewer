@@ -93,10 +93,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Step 10: Set `NITRO_PRESET=node` in Azure App Service
+      # ✅ Step 10: Set `NITRO_PRESET=node-server` in Azure App Service
       - name: Configure Azure App Service Environment Variables
         run: |
-          az webapp config appsettings set --resource-group srai-github-reporting --name srai-github-insights --settings NITRO_PRESET=node
+          az webapp config appsettings set --resource-group srai-github-reporting --name srai-github-insights --settings NITRO_PRESET=node-server
 
       # ✅ Step 11: Set Startup Command for Nuxt Nitro Server
       - name: Set Startup Command in Azure
