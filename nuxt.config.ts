@@ -21,7 +21,6 @@ export default defineNuxtConfig({
     }
   },
 
-  // when enabling ssr option you need to disable inlineStyles and maybe devLogs
   features: {
     inlineStyles: false,
     devLogs: false,
@@ -38,71 +37,59 @@ export default defineNuxtConfig({
   },
 
   css: [],
+
   modules: ['@nuxt/fonts', 'vuetify-nuxt-module', '@nuxt/eslint', 'nuxt-auth-utils'],
 
   vuetify: {
     moduleOptions: {
-      // check https://nuxt.vuetifyjs.com/guide/server-side-rendering.html
       ssrClientHints: {
         reloadOnFirstRequest: false,
         viewportSize: true,
         prefersColorScheme: false,
-
         prefersColorSchemeOptions: {
           useBrowserThemeOnly: false,
         },
       },
-
-      // /* If customizing sass global variables ($utilities, $reset, $color-pack, $body-font-family, etc) */
-      // disableVuetifyStyles: true,
       styles: {
         configFile: 'assets/settings.scss',
       },
     },
   },
 
-  auth: {
-    github: {
-      enabled: true,
-      clientId: '',
-      clientSecret: ''
-    }
-  },
-
-  // ✅ Corrected Nitro Configuration (Port removed from here)
+  // ✅ Fixed Nitro Configuration (Removed `port`)
   nitro: {
-    preset: 'node',   
-    serveStatic: true,  // ✅ Ensures static assets are served correctly
+    preset: 'node-server',   
+    serveStatic: true,  // ✅ Ensures static files are served correctly
+    output: {
+      dir: ".output/"
+    },
     plugins: [
       'plugins/http-agent',
     ],
   },
 
-  // ✅ Added Server Config for Port
-  server: {
-    port: process.env.PORT || 8080, // ✅ Ensures Nuxt runs on Azure's required port
-  },
-
+  // ✅ Ensure `PORT` is set via environment variable
   runtimeConfig: {
-    githubToken: '',
+    githubToken: process.env.NUXT_GITHUB_TOKEN || '',
     session: {
-      // set to 6h - same as the GitHub token
-      maxAge: 60 * 60 * 6,
-      password: '',
+      maxAge: 60 * 60 * 6, // 6 hours
+      password: process.env.NUXT_SESSION_PASSWORD || '',
     },
     oauth: {
       github: {
-        clientId: '',
-        clientSecret: ''
+        clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID || '',
+        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET || '',
       }
     },
+    proxy: process.env.HTTP_PROXY || '',
+
     public: {
-      isDataMocked: false,  // can be overridden by NUXT_PUBLIC_IS_DATA_MOCKED environment variable
-      scope: 'organization',  // can be overridden by NUXT_PUBLIC_SCOPE environment variable
-      githubOrg: '',
-      githubEnt: '',
-      githubTeam: '',
-      usingGithubAuth: false,
+      isDataMocked: process.env.NUXT_PUBLIC_IS_DATA_MOCKED === 'true',
+      scope: process.env.NUXT_PUBLIC_SCOPE || 'organization',
+      githubOrg: process.env.NUXT_PUBLIC_GITHUB_ORG || '',
+      githubEnt: process.env.NUXT_PUBLIC_GITHUB_ENT || '',
+      githubTeam: process.env.NUXT_PUBLIC_GITHUB_TEAM || '',
+      usingGithubAuth: process.env.NUXT_PUBLIC_USING_GITHUB_AUTH === 'true',
       version,
       isPublicApp: false
     }
