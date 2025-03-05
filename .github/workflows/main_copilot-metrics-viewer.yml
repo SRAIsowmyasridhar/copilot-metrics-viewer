@@ -16,6 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+
+      # ✅ Step 555: Clean Old Builds (Prevents cache issues)
+      - name: Clean Old Builds
+        run: rm -rf .output/ node_modules/ package-lock.json pnpm-lock.yaml
+
+      # ✅ Step 66666: Force Nitro Preset for GitHub Build
+      - name: Set Nitro Preset for GitHub Actions
+        run: |
+          echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
+
       # ✅ Step 2: Set up Node.js (Ensure correct version for Nuxt 3)
       - name: Set up Node.js
         uses: actions/setup-node@v3
