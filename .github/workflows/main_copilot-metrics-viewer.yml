@@ -45,6 +45,10 @@ jobs:
       - name: Verify Nuxt Build Output
         run: ls -R .output/
 
+       # ✅ Step : Archive Build Output (Fix for Missing .output/)
+      - name: Compress `.output/` for deployment
+        run: zip -r output.zip .output/
+
       # ✅ Step 7: Azure Login
       - name: Azure Login
         uses: azure/login@v1
