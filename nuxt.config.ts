@@ -58,7 +58,7 @@ export default defineNuxtConfig({
 
   // ✅ Fixed Nitro Configuration (Removed `port`)
   nitro: {
-    preset: 'node-server',   
+    preset: process.env.NITRO_PRESET || 'node-server',   
     serveStatic: true,  // ✅ Ensures static files are served correctly
     output: {
       dir: ".output/"
