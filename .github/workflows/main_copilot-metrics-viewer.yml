@@ -31,10 +31,13 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH  # Add PNPM to PATH
           pnpm --version  # Verify PNPM installation
 
+       # ✅ Step 4.1: Clean Old Builds (Prevents Cache Issues)
+      - name: Clean Old Builds
+        run: rm -rf .output/ node_modules/ package-lock.json pnpm-lock.yaml
+
       # ✅ Step 4: Install dependencies with PNPM
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
 
       # ✅ Step 5.0: Check and Output Contents of `nuxt.config.ts`
       - name: Check `nuxt.config.ts`
@@ -51,14 +54,16 @@ jobs:
       # ✅ Step prset
       - name: Force Nitro Preset for GitHub Build
         run: |
-            echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
-            export NITRO_PRESET=node-server
-            printenv | grep NITRO  # ✅ Debugging step to verify
+          echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
+          echo "Using Nitro Preset: $NITRO_PRESET"
+          export NITRO_PRESET=node-server
+          env | grep NITRO  # ✅ Debugging step to verify
+
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
         run: |
-          export NITRO_PRESET=node  # ✅ Ensure Nitro generates `.output/`
+          export NITRO_PRESET=node-server  # ✅ Ensure Nitro generates `.output/`
           pnpm run build
 
       # ✅ Step 6: Ensure `.output/` Contains Server Files (Fail if missing)
