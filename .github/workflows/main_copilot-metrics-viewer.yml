@@ -41,13 +41,18 @@ jobs:
       - name: Build Nuxt 3 app
         run: pnpm run build
 
-      # ✅ Step 6: Ensure `.output/` Contains Server Files
+      # ✅ Step 6: Ensure `.output/` Contains Server Files (Fail if missing)
       - name: Verify Nuxt Build Output
-        run: ls -R .output/
+        run: |
+          if [ ! -d ".output" ]; then
+            echo "❌ ERROR: .output/ directory does not exist! Build failed!"
+            exit 1
+          fi
+          ls -R .output/
 
-       # ✅ Step : Archive Build Output (Fix for Missing .output/)
-      - name: Compress `.output/` for deployment
-        run: zip -r output.zip .output/
+      # ✅ Step : Debug `.output/` before Deployment
+      - name: Debug `.output/`
+        run: du -sh .output/
 
       # ✅ Step 7: Azure Login
       - name: Azure Login
