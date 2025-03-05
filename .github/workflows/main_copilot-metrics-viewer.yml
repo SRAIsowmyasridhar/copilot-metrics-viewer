@@ -70,6 +70,10 @@ jobs:
       - name: Compress `.output/`
         run: zip -r output.zip .output/
 
+      # ✅ Step 111: print nitro
+      - name: Print Nitro Preset Before Deployment
+        run: cat .output/nitro.json
+
       # ✅ Step 9: Azure Login
       - name: Azure Login
         uses: azure/login@v1
