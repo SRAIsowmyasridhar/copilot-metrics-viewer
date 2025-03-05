@@ -54,10 +54,12 @@ jobs:
       # ✅ Step prset
       - name: Force Nitro Preset for GitHub Build
         run: |
-          echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
-          echo "Using Nitro Preset: $NITRO_PRESET"
-          export NITRO_PRESET=node-server
-          env | grep NITRO  # ✅ Debugging step to verify
+          echo "export NITRO_PRESET=node-server" >> ~/.bashrc
+          echo "export NITRO_PRESET=node-server" >> ~/.profile
+          source ~/.bashrc
+          source ~/.profile
+          echo "🔍 NITRO_PRESET set to:" $NITRO_PRESET
+          env | grep NITRO  # ✅ Debugging step
 
 
       # ✅ Step 5: Build Nuxt 3 app
