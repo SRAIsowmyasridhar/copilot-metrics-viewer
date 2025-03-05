@@ -66,6 +66,18 @@ jobs:
           export NITRO_PRESET=node-server  # ✅ Ensure Nitro generates `.output/`
           pnpm run build
 
+
+   # ✅ Step 5.1: Print `index.mjs` Content Before Deployment
+      - name: Print Generated `index.mjs`
+        run: |
+          if [ -f ".output/server/index.mjs" ]; then
+            echo "✅ Found .output/server/index.mjs:"
+            cat .output/server/index.mjs
+          else
+            echo "❌ ERROR: .output/server/index.mjs does not exist!"
+            exit 1
+          fi          
+
       # ✅ Step 6: Ensure `.output/` Contains Server Files (Fail if missing)
       - name: Verify Nuxt Build Output
         run: |
