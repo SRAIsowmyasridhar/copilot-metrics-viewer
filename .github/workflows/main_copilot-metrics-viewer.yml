@@ -45,7 +45,12 @@ jobs:
           else
             echo "nuxt.config.ts file not found"
             exit 1
-          fi        
+          fi  
+
+      - name: Force Nitro Preset for GitHub Build
+        run: |
+            echo "NITRO_PRESET=node-server" >> $GITHUB_ENV
+
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
