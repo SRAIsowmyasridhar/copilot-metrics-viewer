@@ -31,14 +31,22 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH  # Add PNPM to PATH
           pnpm --version  # Verify PNPM installation
 
-       # ✅ Step 4.1: Clean Old Builds (Prevents Cache Issues)
+       # ✅ Step 4: Clean Old Builds (Prevents Cache Issues)
       - name: Clean Old Builds
         run: rm -rf .output/ node_modules/ package-lock.json pnpm-lock.yaml
 
-      # ✅ Step 4: Install dependencies with PNPM
+      # ✅ Step 5: Install dependencies with PNPM
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      # ✅ Step 5: Force Nitro Preset for Linux Deployment
+      - name: Force Nitro Preset for Linux Build
+        run: |
+          echo "export NITRO_PRESET=node-server" >> ~/.bashrc
+          source ~/.bashrc
+          echo "NITRO_PRESET set to:" $NITRO_PRESET
+          env | grep NITRO  # Debugging step
+        
       # ✅ Step 5.0: Check and Output Contents of `nuxt.config.ts`
       - name: Check `nuxt.config.ts`
         run: |
@@ -52,15 +60,12 @@ jobs:
 
       
       # ✅ Step prset
-      - name: Force Nitro Preset for GitHub Build
+      - name: Force Nitro Preset for Linux Build
         run: |
           echo "export NITRO_PRESET=node-server" >> ~/.bashrc
-          echo "export NITRO_PRESET=node-server" >> ~/.profile
           source ~/.bashrc
-          source ~/.profile
           echo "🔍 NITRO_PRESET set to:" $NITRO_PRESET
-          env | grep NITRO  # ✅ Debugging step
-
+          env | grep NITRO  # Debugging step
 
       # ✅ Step 5: Build Nuxt 3 app
       - name: Build Nuxt 3 app
@@ -111,7 +116,8 @@ jobs:
       - name: Configure Azure App Service Environment Variables
         run: |
           az webapp config appsettings set --resource-group srai-github-reporting --name srai-github-insights --settings NITRO_PRESET=node-server
-
+          WEBSITES_ENABLE_APP_SERVICE_STORAGE=true
+          
       # ✅ Step 11: Set Startup Command for Nuxt Nitro Server
       - name: Set Startup Command in Azure
         run: |
